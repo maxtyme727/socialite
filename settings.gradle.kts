@@ -22,6 +22,7 @@ pluginManagement {
         maven {
             url = uri("https://androidx.dev/snapshots/builds/13508953/artifacts/repository")
         }
+        maven { url = uri("https://maven.google.com") }
     }
 }
 
@@ -34,6 +35,7 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://androidx.dev/snapshots/builds/13496827/artifacts/repository")
         }
+        maven { url = uri("https://maven.google.com") }
     }
 }
 

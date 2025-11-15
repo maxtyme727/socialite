@@ -19,6 +19,9 @@
     <string name="timeline">Timeline</string>
     <string name="chats">Chats</string>
     <string name="settings">Settings</string>
+    <string name="map">Map</string>
+    <string name="feed">Feed</string>
+    <string name="ai_content">AI Content</string>
     <string name="chat">Chat</string>
 
     <!-- Timeline -->

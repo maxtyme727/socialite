@@ -183,6 +183,9 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.ai)
+    implementation(libs.firebase.firestore)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
     implementation(libs.datastore)
 
     implementation(libs.adaptive.navigation3)

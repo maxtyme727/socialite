@@ -64,6 +64,10 @@ import com.google.android.samples.socialite.ui.navigation.SocialiteNavSuite
 import com.google.android.samples.socialite.ui.navigation.TopLevelDestination
 import com.google.android.samples.socialite.ui.photopicker.navigation.PhotoPickerRoute
 import com.google.android.samples.socialite.ui.player.VideoPlayerScreen
+import com.google.android.samples.socialite.ui.aicontent.AiContentScreen
+import com.google.android.samples.socialite.ui.feed.FeedScreen
+import com.google.android.samples.socialite.ui.map.MapScreen
+import com.google.android.samples.socialite.ui.reviews.ReviewsScreen
 import com.google.android.samples.socialite.ui.videoedit.VideoEditScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -159,6 +163,14 @@ fun MainNavigation(
                                 )
                             }
 
+                            is Pane.AiContent -> NavEntry(backStackKey) {
+                                AiContentScreen(Modifier.fillMaxSize())
+                            }
+
+                            is Pane.Feed -> NavEntry(backStackKey) {
+                                FeedScreen(Modifier.fillMaxSize())
+                            }
+
                             is Pane.ChatThread -> NavEntry(
                                 key = backStackKey,
                                 metadata = ListDetailSceneStrategy.detailPane(),
@@ -218,6 +230,10 @@ fun MainNavigation(
                                 )
                             }
 
+                            is Pane.Reviews -> NavEntry(backStackKey) {
+                                ReviewsScreen(Modifier.fillMaxSize(), backStackKey.locationId)
+                            }
+
                             is Pane.VideoEdit -> NavEntry(backStackKey) {
                                 VideoEditScreen(
                                     chatId = backStackKey.chatId,
@@ -243,6 +259,10 @@ fun MainNavigation(
                                     uri = backStackKey.uri,
                                     onCloseButtonClicked = { backStack.removeLastOrNull() },
                                 )
+                            }
+
+                            is Pane.Map -> NavEntry(backStackKey) {
+                                MapScreen(Modifier.fillMaxSize())
                             }
 
                             else -> NavEntry(backStackKey) {

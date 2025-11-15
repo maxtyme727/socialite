@@ -19,7 +19,10 @@ package com.google.android.samples.socialite.ui.navigation
 import android.os.Parcelable
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.DynamicFeed
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.VideoLibrary
 import androidx.compose.material3.Icon
@@ -40,19 +43,7 @@ import kotlinx.serialization.Serializable
 sealed interface Pane : Parcelable {
     @Parcelize
     @Serializable
-    data object Timeline : Pane
-
-    @Parcelize
-    @Serializable
-    data object ChatsList : Pane
-
-    @Parcelize
-    @Serializable
-    data object Settings : Pane
-
-    @Parcelize
-    @Serializable
-    data object Home : Pane
+    data object AiContent : Pane
 
     @Parcelize
     @Serializable
@@ -64,11 +55,39 @@ sealed interface Pane : Parcelable {
 
     @Parcelize
     @Serializable
-    data class Camera(val chatId: Long) : Pane
+    data object ChatsList : Pane
+
+    @Parcelize
+    @Serializable
+    data object Feed : Pane
+
+    @Parcelize
+    @Serializable
+    data object Home : Pane
+
+    @Parcelize
+    @Serializable
+    data object Map : Pane
 
     @Parcelize
     @Serializable
     data class PhotoPicker(val chatId: Long) : Pane
+
+    @Parcelize
+    @Serializable
+    data class Camera(val chatId: Long) : Pane
+
+    @Parcelize
+    @Serializable
+    data class Reviews(val locationId: String) : Pane
+
+    @Parcelize
+    @Serializable
+    data object Settings : Pane
+
+    @Parcelize
+    @Serializable
+    data object Timeline : Pane
 
     @Parcelize
     @Serializable
@@ -84,20 +103,35 @@ enum class TopLevelDestination(
     @StringRes val label: Int,
     val imageVector: ImageVector,
 ) {
-    Timeline(
-        pane = Pane.Timeline,
-        label = R.string.timeline,
-        imageVector = Icons.Outlined.VideoLibrary,
+    AiContent(
+        pane = Pane.AiContent,
+        label = R.string.ai_content,
+        imageVector = Icons.Outlined.AutoAwesome,
     ),
     ChatsList(
         pane = Pane.ChatsList,
         label = R.string.chats,
         imageVector = Icons.Outlined.ChatBubbleOutline,
     ),
+    Feed(
+        pane = Pane.Feed,
+        label = R.string.feed,
+        imageVector = Icons.Outlined.DynamicFeed,
+    ),
+    Map(
+        pane = Pane.Map,
+        label = R.string.map,
+        imageVector = Icons.Outlined.LocationOn,
+    ),
     Settings(
         pane = Pane.Settings,
         label = R.string.settings,
         imageVector = Icons.Outlined.Settings,
+    ),
+    Timeline(
+        pane = Pane.Timeline,
+        label = R.string.timeline,
+        imageVector = Icons.Outlined.VideoLibrary,
     ),
     ;
 

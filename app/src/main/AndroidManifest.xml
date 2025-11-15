@@ -142,6 +142,10 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCwKkpZkTtyehr-UBbresDT8rzPZZHPm7A" />
+
 
         <activity
             android:name=".widget.SociaLiteAppWidgetConfigActivity"
