@@ -96,6 +96,18 @@ sealed interface Pane : Parcelable {
     @Parcelize
     @Serializable
     data class VideoPlayer(val uri: String) : Pane
+
+    @Parcelize
+    @Serializable
+    data object Gemini : Pane
+
+    @Parcelize
+    @Serializable
+    data object SignIn : Pane
+
+    @Parcelize
+    @Serializable
+    data object Error : Pane
 }
 
 enum class TopLevelDestination(
@@ -133,10 +145,15 @@ enum class TopLevelDestination(
         label = R.string.timeline,
         imageVector = Icons.Outlined.VideoLibrary,
     ),
+    Gemini(
+        pane = Pane.Gemini,
+        label = R.string.gemini,
+        imageVector = Icons.Outlined.AutoAwesome,
+    ),
     ;
 
     companion object {
-        val START_DESTINATION = ChatsList
+        val START_DESTINATION = SignIn
 
         fun fromPane(pane: Pane?): TopLevelDestination {
             return entries.find { it.pane::class == pane?.let { r -> r::class } }

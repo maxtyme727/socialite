@@ -187,6 +187,8 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
     implementation(libs.datastore)
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
 
     implementation(libs.adaptive.navigation3)
     implementation(libs.navigation3.runtime)

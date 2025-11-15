@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.socialite
+package com.google.android.samples.socialite.ui.error
 
-import android.app.Application
-import com.google.android.samples.socialite.ui.error.ErrorViewModel
-import dagger.hilt.android.HiltAndroidApp
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-@HiltAndroidApp
-class SocialApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        val viewModel = ErrorViewModel()
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            viewModel.addError(e.message ?: "Unknown error")
-        }
+class ErrorViewModel : ViewModel() {
+    private val _errors = MutableStateFlow<List<String>>(emptyList())
+    val errors = _errors.asStateFlow()
+
+    fun addError(error: String) {
+        _errors.value = _errors.value + error
     }
 }

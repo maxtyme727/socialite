@@ -142,7 +142,10 @@ fun MainNavigation(
                             }
 
                             is Pane.Settings -> NavEntry(backStackKey) {
-                                Settings(Modifier.fillMaxSize())
+                                Settings(
+                                    modifier = Modifier.fillMaxSize(),
+                                    onErrorClick = { backStack.add(Pane.Error) }
+                                )
                             }
 
                             is Pane.ChatsList -> NavEntry(
@@ -263,6 +266,24 @@ fun MainNavigation(
 
                             is Pane.Map -> NavEntry(backStackKey) {
                                 MapScreen(Modifier.fillMaxSize())
+                            }
+
+                            is Pane.Gemini -> NavEntry(backStackKey) {
+                                com.google.android.samples.socialite.ui.gemini.GeminiScreen(Modifier.fillMaxSize())
+                            }
+
+                            is Pane.SignIn -> NavEntry(backStackKey) {
+                                com.google.android.samples.socialite.ui.auth.SignInScreen(
+                                    modifier = Modifier.fillMaxSize(),
+                                    onSignInSuccess = {
+                                        backStack.clear()
+                                        backStack.add(Pane.ChatsList)
+                                    }
+                                )
+                            }
+
+                            is Pane.Error -> NavEntry(backStackKey) {
+                                com.google.android.samples.socialite.ui.error.ErrorScreen(Modifier.fillMaxSize())
                             }
 
                             else -> NavEntry(backStackKey) {

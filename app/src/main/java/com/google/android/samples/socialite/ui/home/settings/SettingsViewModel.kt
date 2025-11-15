@@ -16,48 +16,36 @@
 
 package com.google.android.samples.socialite.ui.home.settings
 
-import android.content.Context
-import android.widget.Toast
-import androidx.core.performance.DevicePerformance
+import android.app.Application
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.samples.socialite.data.DatabaseManager
 import com.google.android.samples.socialite.repository.ChatRepository
+import com.google.android.samples.socialite.ui.chat.ChatViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    @ApplicationContext private val application: Context,
-    private val repository: ChatRepository,
-    private val databaseManager: DatabaseManager,
-    devicePerformance: DevicePerformance,
+    private val app: Application,
+    private val chatViewModel: ChatViewModel
 ) : ViewModel() {
-    val mediaPerformanceClass = devicePerformance.mediaPerformanceClass
 
-    fun clearMessages() {
-        viewModelScope.launch {
-            repository.clearMessages()
-            withContext(Dispatchers.IO) {
-                databaseManager.wipeAndReinitializeDatabase()
-            }
-            Toast.makeText(
-                application.applicationContext,
-                "Messages have been reset",
-                Toast.LENGTH_SHORT,
-            ).show()
-        }
+    private val _isChatbotEnabled = MutableStateFlow(false)
+    val isChatbotEnabled = _isChatbotEnabled.asStateFlow()
+
+    fun clearMessageHistory() {
+        // TODO: Implement
     }
-
-    val isBotEnabledFlow = repository.isBotEnabled
 
     fun toggleChatbot() {
-        viewModelScope.launch {
-            repository.toggleChatbotSetting()
-        }
+        _isChatbotEnabled.value = !_isChatbotEnabled.value
+        chatViewModel.setChatbotEnabled(_isChatbotEnabled.value)
     }
+
+    val a11yEnabled = MutableStateFlow(false)
+    val isPerformanceClass = MutableStateFlow(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
 }

@@ -45,6 +45,7 @@ fun ChatScreen(
 ) {
     val chat by viewModel.getChat(chatId).collectAsState()
     var message by remember { mutableStateOf("") }
+    var taggedUsers by remember { mutableStateOf(listOf<String>()) }
 
     Column(modifier = modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.weight(1f)) {
@@ -59,6 +60,9 @@ fun ChatScreen(
                 label = { Text(stringResource(R.string.message)) },
                 modifier = Modifier.weight(1f)
             )
+            Button(onClick = { /* TODO: Implement user tagging */ }) {
+                Text(stringResource(R.string.tag_user))
+            }
             Button(onClick = {
                 viewModel.sendMessage(chatId, message)
                 message = ""

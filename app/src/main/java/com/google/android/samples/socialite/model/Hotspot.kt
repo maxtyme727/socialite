@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.socialite
+package com.google.android.samples.socialite.model
 
-import android.app.Application
-import com.google.android.samples.socialite.ui.error.ErrorViewModel
-import dagger.hilt.android.HiltAndroidApp
+import com.google.firebase.firestore.GeoPoint
 
-@HiltAndroidApp
-class SocialApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        val viewModel = ErrorViewModel()
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            viewModel.addError(e.message ?: "Unknown error")
-        }
-    }
-}
+data class Hotspot(
+    val id: String = "",
+    val name: String = "",
+    val location: GeoPoint = GeoPoint(0.0, 0.0)
+)

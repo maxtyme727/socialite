@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.socialite
+package com.google.android.samples.socialite.repository
 
-import android.app.Application
-import com.google.android.samples.socialite.ui.error.ErrorViewModel
-import dagger.hilt.android.HiltAndroidApp
+import com.google.firebase.vertexai.FirebaseVertexAI
+import com.google.firebase.vertexai.type.GenerateContentResponse
+import javax.inject.Inject
 
-@HiltAndroidApp
-class SocialApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        val viewModel = ErrorViewModel()
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            viewModel.addError(e.message ?: "Unknown error")
-        }
+class ChatbotRepository @Inject constructor() {
+    private val generativeModel = FirebaseVertexAI.getInstance()
+        .generativeModel("gemini-pro")
+
+    suspend fun getChatbotResponse(message: String): GenerateContentResponse {
+        return generativeModel.generateContent(message)
     }
 }

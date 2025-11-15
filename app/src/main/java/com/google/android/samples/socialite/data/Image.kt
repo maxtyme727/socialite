@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.socialite
+package com.google.android.samples.socialite.data
 
-import android.app.Application
-import com.google.android.samples.socialite.ui.error.ErrorViewModel
-import dagger.hilt.android.HiltAndroidApp
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@HiltAndroidApp
-class SocialApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        val viewModel = ErrorViewModel()
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            viewModel.addError(e.message ?: "Unknown error")
-        }
-    }
-}
+@Entity(tableName = "images")
+data class Image(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val uri: String
+)

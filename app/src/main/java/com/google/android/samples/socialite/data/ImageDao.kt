@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.socialite
+package com.google.android.samples.socialite.data
 
-import android.app.Application
-import com.google.android.samples.socialite.ui.error.ErrorViewModel
-import dagger.hilt.android.HiltAndroidApp
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
-@HiltAndroidApp
-class SocialApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        val viewModel = ErrorViewModel()
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            viewModel.addError(e.message ?: "Unknown error")
-        }
-    }
+@Dao
+interface ImageDao {
+    @Query("SELECT * FROM images")
+    fun getImages(): Flow<List<Image>>
+
+    @Insert
+    suspend fun insertImage(image: Image)
 }

@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.socialite
+package com.google.android.samples.socialite.repository
 
-import android.app.Application
-import com.google.android.samples.socialite.ui.error.ErrorViewModel
-import dagger.hilt.android.HiltAndroidApp
+import com.google.android.samples.socialite.data.ImageDao
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-@HiltAndroidApp
-class SocialApp : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        val viewModel = ErrorViewModel()
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            viewModel.addError(e.message ?: "Unknown error")
-        }
-    }
+class FeedRepository @Inject constructor(
+    private val imageDao: ImageDao
+) {
+    fun getImages() = imageDao.getImages()
 }

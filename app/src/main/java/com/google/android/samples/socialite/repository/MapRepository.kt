@@ -16,33 +16,29 @@
 
 package com.google.android.samples.socialite.repository
 
-import com.google.android.samples.socialite.model.Chat
-import com.google.android.samples.socialite.model.Message
+import com.google.android.samples.socialite.model.Hotspot
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
-class ChatRepository @Inject constructor() {
+class MapRepository @Inject constructor() {
     private val firestore = Firebase.firestore
 
-    fun getChat(chatId: String): Flow<Chat?> = callbackFlow {
-        val subscription = firestore.collection("chats").document(chatId)
+    fun getHotspots(): Flow<List<Hotspot>> = callbackFlow {
+        val subscription = firestore.collection("hotspots")
             .addSnapshotListener { snapshot, _ ->
-                if (snapshot != null && snapshot.exists()) {
-                    trySend(snapshot.toObject<Chat>())
-                } else {
-                    trySend(null)
+                if (snapshot != null) {
+                    trySend(snapshot.toObjects())
                 }
             }
         awaitClose { subscription.remove() }
     }
 
-    fun sendMessage(chatId: String, message: Message) {
-        firestore.collection("chats").document(chatId)
-            .collection("messages").add(message)
+    fun createHotspot(hotspot: Hotspot) {
+        firestore.collection("hotspots").add(hotspot)
     }
 }

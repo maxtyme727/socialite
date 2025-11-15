@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.socialite.ui.feed
+package com.google.android.samples.socialite.ui.error
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,37 +28,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberAsyncImagePainter
 import com.google.android.samples.socialite.R
-import com.google.android.samples.socialite.data.Image
 
 @Composable
-fun FeedScreen(
+fun ErrorScreen(
     modifier: Modifier = Modifier,
-    viewModel: FeedViewModel = viewModel()
+    viewModel: ErrorViewModel = viewModel()
 ) {
-    val images by viewModel.images.collectAsState()
+    val errors by viewModel.errors.collectAsState()
 
-    if (images.isEmpty()) {
+    if (errors.isEmpty()) {
         Box(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(stringResource(R.string.no_images_found))
+            Text(stringResource(R.string.no_errors_found))
         }
     } else {
         LazyColumn(modifier = modifier) {
-            items(images) { image ->
-                Column {
-                    Image(
-                        painter = rememberAsyncImagePainter(image.uri),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    Button(onClick = { /* TODO: Implement image sharing */ }) {
-                        Text(stringResource(R.string.share))
-                    }
-                }
+            items(errors) { error ->
+                Text(text = error)
             }
         }
     }

@@ -92,5 +92,19 @@
 
     <!-- Timeline screen -->
     <string name="close_carousel">Close carousel</string>
+    <string name="prompt">Prompt</string>
+    <string name="generate_image">Generate Image</string>
+    <string name="save_image">Save Image</string>
+    <string name="gemini">Gemini</string>
+    <string name="no_images_found">No images found</string>
+    <string name="share">Share</string>
+    <string name="search">Search</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
+    <string name="tag_user">Tag User</string>
+    <string name="hotspot_name">Hotspot Name</string>
+    <string name="add_hotspot">Add Hotspot</string>
+    <string name="no_errors_found">No errors found</string>
+    <string name="view_errors">View Errors</string>
 
 </resources>

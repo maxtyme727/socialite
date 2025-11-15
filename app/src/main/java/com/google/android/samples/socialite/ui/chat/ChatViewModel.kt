@@ -16,198 +16,64 @@
 
 package com.google.android.samples.socialite.ui.chat
 
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.clearText
-import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.samples.socialite.model.Chat
+import com.google.android.samples.socialite.model.Message
 import com.google.android.samples.socialite.repository.ChatRepository
-import com.google.android.samples.socialite.ui.stateInUi
+import com.google.android.samples.socialite.repository.ChatbotRepository
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val repository: ChatRepository,
+    private val chatRepository: ChatRepository,
+    private val chatbotRepository: ChatbotRepository
 ) : ViewModel() {
+    private var isChatbotEnabled = false
 
-    private val chatId = MutableStateFlow(0L)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val chatDetail = chatId.flatMapLatest { id -> repository.findChat(id) }
-
-    private val attendees =
-        chatDetail.map { c -> (c?.attendees ?: emptyList()).associateBy { it.id } }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val messagesInChat = chatId.flatMapLatest { id -> repository.findMessages(id) }
-
-    val chat = chatDetail.stateInUi(null)
-
-    val messages = combine(messagesInChat, attendees) { messages, attendees ->
-
-        // List of senders, which is referred to the message list to show or not the icon.
-        val senderList = messages.fold(emptyList<Long?>()) { list, message ->
-            val senderId = if (list.isEmpty() || list.last() != message.senderId) {
-                message.senderId
-            } else {
-                null
-            }
-            list + senderId
-        }
-
-        messages.zip(senderList).map { (message, senderId) ->
-            // Show the sender's icon only for the first message in a row from the same sender.
-            val senderIconUri = if (senderId != null) {
-                attendees[senderId]?.iconUri
-            } else {
-                null
-            }
-
-            ChatMessage(
-                text = message.text,
-                mediaUri = message.mediaUri,
-                mediaMimeType = message.mediaMimeType,
-                timestamp = message.timestamp,
-                isIncoming = message.isIncoming,
-                senderIconUri = senderIconUri,
+    fun getChat(chatId: String): StateFlow<Chat?> {
+        return chatRepository.getChat(chatId)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = null
             )
-        }
-    }.stateInUi(emptyList())
-
-    val textFieldState = TextFieldState()
-    private val attachedMediaItem = MutableStateFlow<MediaItem?>(null)
-    val attachedMedia = attachedMediaItem
-
-    private val isInputValidFlow = snapshotFlow {
-        isInputValid(textFieldState)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val sendEnabled = combine(
-        isInputValidFlow,
-        attachedMediaItem,
-    ) { isInputValid, attachedMediaItem ->
-        isInputValid || attachedMediaItem != null
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        false,
-    )
-
-    private var inputPrefilled = false
-    private var inputImagePrefilled = false
-
-    /**
-     * We want to update the notification when the corresponding chat screen is open. Setting this
-     * to `true` updates the current notification, removing the unread message(s) badge icon and
-     * suppressing further notifications.
-     */
-    fun setForeground(foreground: Boolean) {
-        val chatId = chatId.value
-        if (chatId != 0L) {
-            if (foreground) {
-                repository.activateChat(chatId)
-            } else {
-                repository.deactivateChat(chatId)
-            }
-        }
-    }
-
-    fun setChatId(chatId: Long) {
-        this.chatId.value = chatId
-    }
-
-    fun updateInput(input: String) {
-        textFieldState.setTextAndPlaceCursorAtEnd(input)
-    }
-
-    fun prefillInput(input: String) {
-        if (inputPrefilled) return
-        inputPrefilled = true
-        updateInput(input)
-    }
-
-    fun prefillInputImage(inputImage: String) {
-        if (inputImagePrefilled) return
-        inputImagePrefilled = true
-        attachMedia(MediaItem(inputImage, "image/*"))
-    }
-
-    fun attachMedia(mediaItem: MediaItem) {
-        viewModelScope.launch {
-            repository.saveAttachedMediaItem(mediaItem)
-                .onSuccess {
-                    attachedMediaItem.emit(it)
-                }
-                .onFailure {
-                    attachedMediaItem.emit(null)
-                }
-        }
-    }
-
-    fun removeAttachedMedia() {
-        viewModelScope.launch {
-            val mediaItem = attachedMediaItem.value
-            if (mediaItem != null) {
-                repository.removeAttachedMediaItem(mediaItem)
-                    .onSuccess {
-                        attachedMediaItem.emit(null)
-                    }
-                    .onFailure {}
-            }
-        }
-    }
-
-    fun send() {
-        val chatId = chatId.value
-        if (chatId <= 0) return
-        if (!sendEnabled.value) return
-
-        val mediaItem = attachedMediaItem.value
-        val input = textFieldState.text.toString()
-        viewModelScope.launch {
-            if (mediaItem != null) {
-                repository.sendMessage(chatId, input, mediaItem.uri, mediaItem.mimeType)
-            } else {
-                repository.sendMessage(chatId, input, null, null)
-            }
-            textFieldState.clearText()
-            attachedMediaItem.emit(null)
-        }
-    }
-}
-
-private fun isInputValid(textFieldState: TextFieldState): Boolean {
-    return textFieldState.text.isNotBlank()
-}
-
-data class MediaItem(val uri: String, val mimeType: String) {
-
-    val extension get(): String? {
-        return mimeTypeToExtensionMap[mimeType]
-    }
-
-    companion object {
-        private val mimeTypeToExtensionMap = mapOf(
-            "image/bmp" to "bmp",
-            "image/gif" to "gif",
-            "image/jpeg" to "jpg",
-            "image/jpg" to "jpg",
-            "image/png" to "png",
-            "image/svg+xml" to "svg",
-            "image/webp" to "webp",
-            "video/mp4" to "mp4",
-            "video/mpeg" to "mpeg",
+    fun sendMessage(chatId: String, text: String) {
+        val message = Message(
+            text = text,
+            author = Firebase.auth.currentUser?.displayName ?: ""
         )
+        chatRepository.sendMessage(chatId, message)
+        if (isChatbotEnabled) {
+            getChatbotResponse(chatId, text)
+        }
+    }
+
+    fun setChatbotEnabled(isEnabled: Boolean) {
+        isChatbotEnabled = isEnabled
+    }
+
+    private fun getChatbotResponse(chatId: String, message: String) {
+        viewModelScope.launch {
+            try {
+                val response = chatbotRepository.getChatbotResponse(message)
+                val chatbotMessage = Message(
+                    text = response.text ?: "",
+                    author = "Chatbot"
+                )
+                chatRepository.sendMessage(chatId, chatbotMessage)
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
     }
 }
